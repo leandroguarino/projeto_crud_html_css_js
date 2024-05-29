@@ -30,14 +30,20 @@ function alterar(cpf){
 }
 function excluir(cpf){
     if (confirm("Você deseja realmente excluir?")){
-        for(let i=0; i < clientes.length; i++){
-            let cliente = clientes[i]
-            if (cliente.cpf == cpf){
-                //remove o elemento encontrado na posição "i"
-                clientes.splice(i, 1) 
-            }
-        }
-        exibirDados()
+        fetch("http://localhost:3000/excluir/" + cpf, {
+            headers: {
+                "Content-type": "application/json"
+            },
+            method: "DELETE"
+        }).then((response) => {
+            //após terminar de excluir, recarrega a lista 
+            //de clientes
+            recarregarClientes()
+            alert("Cliente excluído com sucesso")
+        }).catch((error) => {
+            console.log(error)
+            alert("Não foi possível excluir o cliente")
+        })       
     }
 }
 function mostrarModal(){
@@ -84,6 +90,18 @@ function salvar(){
         clienteAlterado.nome = nome
         clienteAlterado.cpf = cpf
         clienteAlterado.telefone = telefone
+        fetch("http://localhost:3000/alterar", {
+            headers: {
+                "Content-type": "application/json"
+            },
+            method: "PUT",
+            body: JSON.stringify(clienteAlterado)
+        }).then((response) => {
+            recarregarClientes()
+            alert("Cliente alterado com sucesso")
+        }).catch((error) => {
+            alert("Não foi possível alterar o cliente")
+        })
     }
 
     clienteAlterado = null
