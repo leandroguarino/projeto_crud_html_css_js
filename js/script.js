@@ -112,6 +112,61 @@ function salvar(){
     }
 }
 
+function salvarConta(){
+    let agencia = document.getElementById("agencia").value
+    let numero = document.getElementById("numero").value
+    let banco = document.getElementById("banco").value
+    let valor = document.getElementById("valor").value
+
+    //se não estiver alterando ninguém, adiciona no vetor
+    if (clienteAlterado == null){
+        let cliente = {
+            "nome": nome,
+            "cpf": cpf,
+            "telefone": telefone
+        }
+
+        //salva o cliente no back-end
+        fetch("http://localhost:3000/cadastrar", {
+            headers: {
+                "Content-type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify(cliente)
+        }).then(() => {
+            clienteAlterado = null
+            //limpa o form
+            limparForm()
+            ocultarModal()
+            recarregarClientes()
+            alert("Cliente cadastrado com sucesso")
+        }).catch(() => {
+            alert("Ops... algo deu errado")
+        })
+
+    }else{
+        clienteAlterado.nome = nome
+        clienteAlterado.cpf = cpf
+        clienteAlterado.telefone = telefone
+        fetch("http://localhost:3000/alterar", {
+            headers: {
+                "Content-type": "application/json"
+            },
+            method: "PUT",
+            body: JSON.stringify(clienteAlterado)
+        }).then((response) => {
+            clienteAlterado = null
+            //limpa o form
+            limparForm()
+            ocultarModal()
+            recarregarClientes()
+            alert("Cliente alterado com sucesso")
+        }).catch((error) => {
+            alert("Não foi possível alterar o cliente")
+        })
+    }
+}
+
 function exibirDados(){
 
     let tbody = document.querySelector("#table-customers tbody")
@@ -126,6 +181,7 @@ function exibirDados(){
             <td>${clientes[i].cpf}</td>
             <td>${clientes[i].telefone}</td>
             <td>
+                <button onclick="adicionarConta('${clientes[i].cpf}')">Adicionar conta</button>
                 <button onclick="alterar('${clientes[i].cpf}')">Alterar</button>
                 <button onclick="excluir('${clientes[i].cpf}')" class="botao-excluir">Excluir</button>
             </td>
